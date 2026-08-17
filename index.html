@@ -263,6 +263,9 @@
   .single-controls button.play { background: #1abc9c; }
   .single-controls button.play:hover { background: #16a085; }
   .single-controls button.play.playing { background: #e74c3c; }
+  .single-controls button.random { background: #7f8c8d; }
+  .single-controls button.random:hover { background: #5d6d7e; }
+  .single-controls button.random.active { background: #9b59b6; border-color: #8e44ad; }
   .single-options {
     display: flex;
     flex-wrap: wrap;
@@ -334,6 +337,7 @@
       <button onclick="singlePrev()">上一个</button>
       <button class="play" id="playBtn" onclick="togglePlay()">自动播放</button>
       <button onclick="singleNext()">下一个</button>
+      <button class="random" id="randomBtn" onclick="toggleRandom()">随机</button>
     </div>
     <div class="single-options">
       <label>朗读来源：
@@ -775,6 +779,7 @@ let mode = 'list';     // list | single
 let singleIndex = 0;
 let playTimer = null;
 let playActive = false;
+let randomMode = false;
 
 // ============ 工具函数 ============
 function getFilteredChars() {
@@ -906,13 +911,26 @@ function renderSingle() {
   }
 }
 
+function pickRandomIndex() {
+  const list = getFilteredChars();
+  if (list.length <= 1) return 0;
+  let idx;
+  do { idx = Math.floor(Math.random() * list.length); } while (idx === singleIndex);
+  return idx;
+}
 function singleNext() {
-  singleIndex++;
+  singleIndex = randomMode ? pickRandomIndex() : singleIndex + 1;
   renderSingle();
 }
 function singlePrev() {
-  singleIndex--;
+  singleIndex = randomMode ? pickRandomIndex() : singleIndex - 1;
   renderSingle();
+}
+function toggleRandom() {
+  randomMode = !randomMode;
+  const btn = document.getElementById('randomBtn');
+  btn.classList.toggle('active', randomMode);
+  btn.textContent = randomMode ? '随机：开' : '随机';
 }
 
 // 键盘支持
